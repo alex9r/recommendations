@@ -1,9 +1,9 @@
 import React from 'react'
 
-const search = ({searchTerm, setSearchTerm}) => {
+const Search = ({searchTerm, setSearchTerm}) => {
   return (
     <div className="search">
-        <img src="search.svg" alt="search" />
+        <img src="/magnifyingGlass.svg" alt="search" />
 
         <input 
             type="text"
@@ -15,4 +15,4 @@ const search = ({searchTerm, setSearchTerm}) => {
   )
 }
 
-export default search
+export default Search

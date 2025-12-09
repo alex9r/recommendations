@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Search from './components/search.jsx'
 import MovieCard from './components/movieCard.jsx';
 import Spinner from './components/spinner.jsx'
-import { useDebounce } from 'react-use';
-import search from './components/search.jsx';
-import { updateSearchCount } from './appwrite.js';
+//import { useDebounce } from 'react-use';
 
-const API_BASE_URL = 'https://api.themoviedb.org/3';
+
+const API_BASE_URL = 'https://api.themoviedb.org/3/';
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const API_OPTIONS = {
   method: 'GET',
   headers: {
-    accept: 'application.json',
-    Authorizations: `Bearer ${API_KEY}`
+    accept: 'application/json',
+    Authorization: `Bearer ${API_KEY}`
   }
 }
 
@@ -22,9 +21,9 @@ const App = () => {
   // state fields for the movies
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [deboundedSearchTerm, setDeboundedSearchTerm] = useDebounce('');
+  // const [deboundedSearchTerm, setDeboundedSearchTerm] = useDebounce('');
 
-  useDebounce(() => setDeboundedSearchTerm(searchTerm), 500, searchTerm);
+  // useDebounce(() => setDeboundedSearchTerm(searchTerm), 500, searchTerm); 
 
   // try to retrieve movie data
   const fetchMovies = async (query = '') => {
@@ -34,8 +33,8 @@ const App = () => {
 
     try {
       const endpoint = query 
-      ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
-      : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
+      ? `${API_BASE_URL}search/movie?query=${encodeURIComponent(query)}`
+      : `${API_BASE_URL}discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc`;
       const response = await fetch(endpoint, API_OPTIONS);
 
       if(!response.ok) {
@@ -46,15 +45,15 @@ const App = () => {
 
       if(data.response == 'False') {
         setErrorMessage(data.Error || 'Failed to fetch movies');
-        setMovieList([]);
+        setMovies([]);
         return;
       }
 
-      setMovieList(data.results || []);
+      setMovies(data.results || []);
 
-      if (query && data.results.length > 0) {
-        await updateSearchCount(query, data.results[0]);
-      }
+      // if (query && data.results.length > 0) {
+      //   await updateSearchCount(query, data.results[0]);
+      // }
 
     } catch (error) {
       console.error(`Error fetching movies: ${error}`);
@@ -66,7 +65,7 @@ const App = () => {
 
   useEffect(() => {
     fetchMovies(searchTerm);
-  }, [searchTerm])
+  }, [searchTerm]);
 
   return (
     <main>
@@ -89,7 +88,7 @@ const App = () => {
             <p className='text-red-500'>{errorMessage}</p>
           ) : (
             <ul>
-              {movieList.map((movie) => (
+              {movies.map((movie) => (
                 <MovieCard key={movie.id} movie={movie} />
               ))}
             </ul>
