@@ -25,6 +25,25 @@ const App = () => {
 
   // useDebounce(() => setDeboundedSearchTerm(searchTerm), 500, searchTerm); 
 
+  const fetchIMDbId = async (movieId) => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}movie/${movieId}/external_ids`,
+        API_OPTIONS
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch IMDb ID');
+      }
+      
+      const data = await response.json();
+      return data.imdb_id || null;
+    } catch (error) {
+      console.error(`Error fetching IMDb ID for movie ${movieId}:`, error);
+      return null;
+    }
+  };
+
   // try to retrieve movie data
   const fetchMovies = async (query = '') => {
 
@@ -49,7 +68,13 @@ const App = () => {
         return;
       }
 
-      setMovies(data.results || []);
+      const moviesWithIMDb = await Promise.all((data.results || []).map(
+        async (movie) => {
+          const imdb_id = await fetchIMDbId(movie.id);
+          return {...movie, imdb_id} 
+        }
+      ))
+      setMovies(moviesWithIMDb);
 
       // if (query && data.results.length > 0) {
       //   await updateSearchCount(query, data.results[0]);
@@ -89,7 +114,9 @@ const App = () => {
           ) : (
             <ul>
               {movies.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
+                <li key={movie.id}> 
+                  <MovieCard movie={movie} />
+                </li>
               ))}
             </ul>
           )

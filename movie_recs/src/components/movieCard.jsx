@@ -1,19 +1,26 @@
 import React from 'react'
 
-const MovieCard = ({movie: {id, title, vote_average, poster_path, release_date, original_language, imbd_id}}) => {
+const MovieCard = ({movie: {id, title, vote_average, poster_path, release_date, original_language, imdb_id}}) => {
+    
   return (
     <div className="movie-card">
         <img src={poster_path ? `https://image.tmdb.org/t/p/w500/${poster_path}` : `/no-movie.svg`} 
             alt={title}
         />
         < div className="mt-4">
-            <h3>{title}</h3>
-            <a href={`https://www.imdb.com/title/${imbd_id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="View on IMDb">
-                🔗
-            </a>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                <h3>{title}</h3>
+                {imdb_id && (
+                    <a 
+                        href={`https://www.imdb.com/title/${imdb_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="View on IMDb"
+                    >
+                        🔗
+                    </a>
+                )}
+            </div>
             <div className="content">
                 <div className="rating">
                     <p>⭐️</p>
